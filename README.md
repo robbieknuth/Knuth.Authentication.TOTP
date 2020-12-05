@@ -30,7 +30,7 @@ Three algorithms are built in out of the box: SHA1, SHA256, and SHA512. Currentl
 
 ## Example - Console
 You can see the example console project
-[TOTP](https://github.com/robbieknuth/Knuth.Authentication.TOTP/tree/main/src/TOTP) for very simple usage. This is effectively the same functionality as a your favorite 2FA app, minus the QR code scanner.
+[TOTP.Console](https://github.com/robbieknuth/Knuth.Authentication.TOTP/tree/main/src/TOTP.Console) for very simple usage. This is effectively the same functionality as a your favorite 2FA app, minus the QR code scanner.
 
 ## Example - Validator
 This example assumes that you have a way to store the TOTP secrets elsewhere. This will be referred to as the `ISecretProvider`

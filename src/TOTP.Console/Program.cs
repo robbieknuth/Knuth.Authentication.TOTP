@@ -5,7 +5,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TOTP
+using SystemConsole = System.Console;
+
+namespace TOTP.Console
 {
     internal static class Program
     {
@@ -13,7 +15,7 @@ namespace TOTP
         {
             if (args.Length != 2)
             {
-                Console.WriteLine("Usage: TOTP.exe <algorithm> <key>");
+                SystemConsole.WriteLine("Usage: TOTP.exe <algorithm> <key>");
                 return 1;
             }
 
@@ -23,7 +25,7 @@ namespace TOTP
                 .GetRequiredService<ITOTPProvider>();
 
             using var cts = new CancellationTokenSource();
-            Console.CancelKeyPress += (sender, eventArgs) =>
+            SystemConsole.CancelKeyPress += (sender, eventArgs) =>
             {
                 cts.Cancel();
                 eventArgs.Cancel = true;
@@ -34,26 +36,26 @@ namespace TOTP
                 while (!cts.Token.IsCancellationRequested)
                 {
                     var codes = totp.GetCodes(args[0], args[1]);
-                    Console.WriteLine($"Current: {codes.CurrentCode} (Previous: {codes.PreviousCode}, Next: {codes.NextCode})");
-                    Console.WriteLine($"    Next refresh in {(int)codes.ValidFor.TotalSeconds} seconds.");
+                    SystemConsole.WriteLine($"Current: {codes.CurrentCode} (Previous: {codes.PreviousCode}, Next: {codes.NextCode})");
+                    SystemConsole.WriteLine($"    Next refresh in {(int)codes.ValidFor.TotalSeconds} seconds.");
                     await Task.Delay(codes.ValidFor, cts.Token);
                 }
             }
             catch (OperationCanceledException) when (cts.Token.IsCancellationRequested) { }
             catch (AlgorithmNotFoundException e)
             {
-                Console.Error.Write(e.Message);
+                SystemConsole.Error.Write(e.Message);
                 return 1;
             }
             catch (FormatException e)
             {
-                Console.Error.WriteLine(e.Message);
+                SystemConsole.Error.WriteLine(e.Message);
                 return 1;
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine("Unexpected exception encountered.");
-                Console.Error.WriteLine(e);
+                SystemConsole.Error.WriteLine("Unexpected exception encountered.");
+                SystemConsole.Error.WriteLine(e);
                 return 1;
             }
 
