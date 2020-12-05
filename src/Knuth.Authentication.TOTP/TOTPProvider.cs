@@ -66,11 +66,6 @@ namespace Knuth.TOTP
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (digits < 6 || digits > 8)
-            {
-                throw new ArgumentOutOfRangeException(nameof(digits), "Must be >= 6 and <= 8.");
-            }
-
             if (period < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(period), "Must be >= 1.");
@@ -100,13 +95,12 @@ namespace Knuth.TOTP
             var hashDestination = hashAlgorithm.ComputeHash(timeStepBytes);
 
             var offset = hashDestination[hashDestination.Length - 1] & 0x0F;
-            var result = this.CreateUInt32(
+            var code = this.CreateUInt32(
                 hashDestination[offset],
                 hashDestination[offset + 1],
                 hashDestination[offset + 2],
                 hashDestination[offset + 3]);
-            var digitizedHashRegion = result % TenToThe.PowerOf(digits);
-            return string.Format($"{{0:D{digits}}}", digitizedHashRegion);
+            return Format(code, digits);
         }
 
         private uint CreateUInt32(uint one, uint two, uint three, uint four)
@@ -118,6 +112,17 @@ namespace Knuth.TOTP
             // obviously. so that's why that stray 0x7f is there. probably because some languages
             // don't have a UInt32.
             return ((one & 0x7f) << 24) | (two << 16) | (three <<  8) | four;
+        }
+
+        private static string Format(uint code, int digits)
+        {
+            return digits switch
+            {
+                6 => $"{code % 1000000:D6}",
+                7 => $"{code % 10000000:D7}",
+                8 => $"{code % 100000000:D8}",
+                _ => throw new ArgumentOutOfRangeException($"Only number of digits >= 6 and <= 8 supported. Request was for '{digits}'.")
+            };
         }
     }
 }

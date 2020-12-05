@@ -7,6 +7,9 @@ namespace Knuth.Authentication.TOTP
         /// <summary>
         /// Decodes an RFC 4648 base32 encoded string. This is not a general purpose decoder. However
         /// it does ignore whitespace characters, '-', '=', and '_';
+        /// 
+        /// This function assumes a valid number of bytes will be decoded. You cannot, for instance, decode
+        /// 10 *bits*. Any extra bits are ignored.
         /// </summary>
         /// <param name="base32String">The base32 encoded string.</param>
         /// <returns>The decoded bytes.</returns>
@@ -33,11 +36,6 @@ namespace Knuth.Authentication.TOTP
             for (var i = 0; i < base32Chars.Length; i++)
             {
                 var c = base32Chars[i];
-                if (c is '=')
-                {
-                    continue;
-                }
-
                 var value = GetCharValue(c);
                 buffer <<= 5;
                 buffer |= value;
