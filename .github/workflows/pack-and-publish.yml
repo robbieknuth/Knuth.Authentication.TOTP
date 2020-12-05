@@ -22,4 +22,4 @@ jobs:
     - name: Push
       env:
         nuget_api_key: ${{ secrets.NUGET_TOKEN }}
-      run: dotnet nuget push "./Knuth.Authentication.TOTP/bin/Release/Knuth.Authentication.TOTP.${GITHUB_REF##*/}.nupkg" -s -s "https://api.nuget.org/v3/index.json" --api-key "${nuget_api_key}"
+      run: dotnet nuget push "./Knuth.Authentication.TOTP/bin/Release/Knuth.Authentication.TOTP.${GITHUB_REF##*/}.nupkg" -s "https://api.nuget.org/v3/index.json" --api-key "${nuget_api_key}"
