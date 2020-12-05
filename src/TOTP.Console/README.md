@@ -1,22 +1,26 @@
 ﻿# Usage
 
 ## Console
-TOTP.Console.exe <ALGORITHM> <KEY>
+`TOTP.Console.exe <ALGORITHM> <KEY>`
 
-eg:
+For example:
 
-TOTP.Console.exe "sha1" "ABCDABCDABCDABCD"
-TOTP.Console.exe "sha256" "ABCD ABCD ABCD ABCD"
-TOTP.Console.exe "sha512" "ABCD-ABCD-ABCD-ABCD"
+`TOTP.Console.exe "sha1" "ABCDABCDABCDABCD"`
+
+`TOTP.Console.exe "sha256" "ABCD ABCD ABCD ABCD"`
+
+`TOTP.Console.exe "sha512" "ABCD-ABCD-ABCD-ABCD"`
 
 ## Dotnet Run
-dotnet run -- <ALGORITHM> <KEY>
+`dotnet run -- <ALGORITHM> <KEY>`
 
-eg:
+For example
 
-dotnet run -- "sha1" "ABCDABCDABCDABCD"
-dotnet run -- "sha256" "ABCD ABCD ABCD ABCD"
-dotnet run -- "sha512" "ABCD-ABCD-ABCD-ABCD"
+`dotnet run -- "sha1" "ABCDABCDABCDABCD"`
+
+`dotnet run -- "sha256" "ABCD ABCD ABCD ABCD"`
+
+`dotnet run -- "sha512" "ABCD-ABCD-ABCD-ABCD"`
 
 ### Sample output
 ```
