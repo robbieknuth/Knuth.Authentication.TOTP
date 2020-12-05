@@ -34,12 +34,13 @@ namespace Knuth.Authentication.TOTP.Test
         [InlineData("2603-10-11T11:33:20Z", Seed64Bytes, "47863826", "sha512")]
         public void TestsFromRFC6238(string dateTime, string key, string code, string algorithm)
         {
+            var totpOptions = new TOTPOptions(digits: 8);
             var totpProvider = new ServiceCollection()
                 .AddTOTP()
                 .AddSingleton<ISystemClock>(new ExplicitSystemClock(dateTime))
                 .BuildServiceProvider()
                 .GetRequiredService<ITOTPProvider>();
-            var result = totpProvider.GetCodes(algorithm, key, 8);
+            var result = totpProvider.GetCodes(algorithm, key, totpOptions);
             Assert.Equal(code, result.CurrentCode);
         }
 
@@ -55,9 +56,9 @@ namespace Knuth.Authentication.TOTP.Test
                 .BuildServiceProvider()
                 .GetRequiredService<ITOTPProvider>();
             var result = totpProvider.GetCodes("sha1", "AABWY3DPEHPK3PXP");
-            Assert.Equal("053248", result.PreviousCode);
+            Assert.True(result.Matches("053248"));
             Assert.Equal("188204", result.CurrentCode);
-            Assert.Equal("260636", result.NextCode);
+            Assert.True(result.Matches("260636"));
             Assert.Equal(TimeSpan.FromSeconds(validFor), result.ValidFor);
         }
 
@@ -73,9 +74,9 @@ namespace Knuth.Authentication.TOTP.Test
                 .BuildServiceProvider()
                 .GetRequiredService<ITOTPProvider>();
             var result = totpProvider.GetCodes("sha1", "AABWY3DPEHPK3PXP");
-            Assert.Equal("651272", result.PreviousCode);
+            Assert.True(result.Matches("651272"));
             Assert.Equal("065145", result.CurrentCode);
-            Assert.Equal("822942", result.NextCode);
+            Assert.True(result.Matches("822942"));
             Assert.Equal(TimeSpan.FromSeconds(validFor), result.ValidFor);
         }
     }

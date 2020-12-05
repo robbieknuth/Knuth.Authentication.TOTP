@@ -1,28 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Knuth.Authentication.TOTP
 {
-    public sealed class TOTPResult
+    internal sealed class TOTPResult : ITOTPResult
     {
-        public string PreviousCode { get; }
+        private readonly ISet<string> previousCodes;
+        private readonly ISet<string> followingCodes;
+
         public string CurrentCode { get; }
-        public string NextCode { get; }
         public TimeSpan ValidFor { get; }
 
-        public TOTPResult(string previousCode, string currentCode, string nextCode, TimeSpan validFor)
+        public TOTPResult(string currentCode, TimeSpan validFor, IEnumerable<string> previousCodes, IEnumerable<string> followingCodes)
         {
-            this.PreviousCode = previousCode ?? throw new ArgumentNullException(nameof(previousCode));
-            this.CurrentCode = currentCode ?? throw new ArgumentNullException(nameof(currentCode));
-            this.NextCode = nextCode ?? throw new ArgumentNullException(nameof(nextCode));
+            this.CurrentCode = currentCode;
+            this.previousCodes = new HashSet<string>(previousCodes);
+            this.followingCodes = new HashSet<string>(followingCodes);
             this.ValidFor = validFor;
         }
 
         public bool Matches(string input)
         {
-            return
-                string.Equals(this.PreviousCode, input) ||
-                string.Equals(this.CurrentCode, input) ||
-                string.Equals(this.NextCode, input);
+            return this.CurrentCode == input ||
+                this.previousCodes.Contains(input) ||
+                this.followingCodes.Contains(input);
         }
     }
 }

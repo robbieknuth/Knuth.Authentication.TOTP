@@ -1,6 +1,8 @@
 ﻿using Knuth.Authentication.TOTP;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace Knuth.TOTP
@@ -49,12 +51,10 @@ namespace Knuth.TOTP
             }
         }
 
-        /// <inheritdoc />
-        public TOTPResult GetCodes(string hashAlgorithm, string key, int digits = 6, int period = 30)
-            => this.GetCodes(hashAlgorithm, Base32.Decode(key), digits, period);
+        public ITOTPResult GetCodes(string hashAlgorithm, string key, TOTPOptions options = null)
+            => this.GetCodes(hashAlgorithm, Base32.Decode(key), options);
 
-        /// <inheritdoc />
-        public TOTPResult GetCodes(string hashAlgorithm, byte[] key, int digits = 6, int period = 30)
+        public ITOTPResult GetCodes(string hashAlgorithm, byte[] key, TOTPOptions options = null)
         {
             if (!this.hashAlgorithms.TryGetValue(hashAlgorithm, out var hashAlgorithmProvider))
             {
@@ -66,21 +66,23 @@ namespace Knuth.TOTP
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (period < 1)
+            if (options is null)
             {
-                throw new ArgumentOutOfRangeException(nameof(period), "Must be >= 1.");
+                options = TOTPOptions.Default;
             }
 
             using var hmac = hashAlgorithmProvider.GetHash(key);
             var secondsSinceEpoch = (ulong)(this.systemClock.UtcNow - unixEpoch).TotalSeconds;
-            var validFor = 30 - (secondsSinceEpoch % (uint)period);
+            var validFor = 30 - (secondsSinceEpoch % (uint)options.Period);
+            var timePeriod = secondsSinceEpoch / (uint)options.Period;
 
-            var timePeriod = secondsSinceEpoch/ (uint)period;
-            return new TOTPResult(
-                this.GetOneCode(hmac, timePeriod - 1, digits),
-                this.GetOneCode(hmac, timePeriod, digits),
-                this.GetOneCode(hmac, timePeriod + 1, digits),
-                TimeSpan.FromSeconds(validFor));
+            var currentCode = this.GetOneCode(hmac, timePeriod, options.Digits);
+            var previousCodes = Enumerable.Range(0, options.PriorPeriods)
+                .Select(x => this.GetOneCode(hmac, timePeriod - (ulong)x - 1, options.Digits));
+            var followingCodes = Enumerable.Range(0, options.FollowingPeriods)
+                .Select(x => this.GetOneCode(hmac, timePeriod + (ulong)x + 1, options.Digits));
+
+            return new TOTPResult(currentCode, TimeSpan.FromSeconds(validFor), previousCodes, followingCodes);
         }
 
         private string GetOneCode(HashAlgorithm hashAlgorithm, ulong timePeriod, int digits)

@@ -36,7 +36,7 @@ namespace TOTP.Console
                 while (!cts.Token.IsCancellationRequested)
                 {
                     var codes = totp.GetCodes(args[0], args[1]);
-                    SystemConsole.WriteLine($"Current: {codes.CurrentCode} (Previous: {codes.PreviousCode}, Next: {codes.NextCode})");
+                    SystemConsole.WriteLine($"Current: {codes.CurrentCode}");
                     SystemConsole.WriteLine($"    Next refresh in {(int)codes.ValidFor.TotalSeconds} seconds.");
                     await Task.Delay(codes.ValidFor, cts.Token);
                 }
