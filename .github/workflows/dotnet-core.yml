@@ -1,4 +1,7 @@
 name: .NET Core
+defaults:
+  run:
+    working-directory: src
 
 on:
   push:
