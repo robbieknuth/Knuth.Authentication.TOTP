@@ -88,7 +88,7 @@ namespace Knuth.Authentication.TOTP
             {
                 var x when x >= 'a' && x <= 'z' => x - 'a',
                 var x when x >= '2' && x <= '7' => x - '2' + 26,
-                _ => throw new FormatException($"Char {c} is not a valid base32 character according to RFC 4648.")
+                _ => throw new FormatException($"Invalid base32 string: char '{c}' is not a valid base32 character according to RFC 4648.")
             };
             return (byte)value;
         }

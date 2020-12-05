@@ -58,7 +58,7 @@ namespace Knuth.TOTP
         {
             if (!this.hashAlgorithms.TryGetValue(hashAlgorithm, out var hashAlgorithmProvider))
             {
-                throw new AlgorithmNotFoundException($"Unable to find hash algorithm for '{hashAlgorithm}'.");
+                throw new AlgorithmNotFoundException(hashAlgorithm);
             }
 
             if (key is null)
