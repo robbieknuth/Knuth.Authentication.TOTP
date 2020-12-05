@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 5.0.100
     - name: Pack
-      run: dotnet pack --configuration Release /p:Version=${GITHUB_REF} /p:InformationalVersion=${GITHUB_SHA}
+      run: dotnet pack --configuration Release /p:Version=${GITHUB_REF##*/} /p:InformationalVersion=${GITHUB_SHA}
     - name: Push
       env:
         nuget_api_key: ${{ secrets.NUGET_TOKEN }}
-      run: dotnet nuget push "./Knuth.Authentication.TOTP/bin/Release/Knuth.Authentication.TOTP.${GITHUB_REF}.nupkg" --api-key "${nuget_api_key}"
+      run: dotnet nuget push "./Knuth.Authentication.TOTP/bin/Release/Knuth.Authentication.TOTP.${GITHUB_REF##*/}.nupkg" --api-key "${nuget_api_key}"
