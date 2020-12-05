@@ -13,19 +13,32 @@ namespace Knuth.TOTP
         private readonly ISystemClock systemClock;
         private readonly DateTime unixEpoch;
 
+        public static IEnumerable<IHashAlgorithmProvider> DefaultHashAlgorithms
+        {
+            get
+            {
+                return new List<IHashAlgorithmProvider>
+                {
+                    new HMACSHA1AlgorithmProvider(),
+                    new HMACSHA256AlgorithmProvider(),
+                    new HMACSHA512AlgorithmProvider()
+                };
+            }
+        }
+
         /// <summary>
         /// Create a object capable of generating TOTP codes.
         /// </summary>
         /// <param name="systemClock">A way to control the system clock. Defaults to <see cref="SystemClock"/> if null.</param>
-        /// <param name="hashAlgorithms">Creators for the hash algorithms to use. There cannot be nulls or duplicate entries.</param>
-        public TOTPProvider(IEnumerable<IHashAlgorithmProvider> hashAlgorithms, ISystemClock systemClock = null)
+        /// <param name="hashAlgorithms">Creators for the hash algorithms to use. If null is set to <see cref="DefaultHashAlgorithms"/> </param>
+        public TOTPProvider(IEnumerable<IHashAlgorithmProvider> hashAlgorithms = null, ISystemClock systemClock = null)
         {
             this.unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             this.systemClock = systemClock ?? new SystemClock();
 
             if (hashAlgorithms is null)
             {
-                throw new ArgumentNullException(nameof(hashAlgorithms));
+                hashAlgorithms = DefaultHashAlgorithms;
             }
 
             this.hashAlgorithms = new Dictionary<string, IHashAlgorithmProvider>(StringComparer.OrdinalIgnoreCase);
